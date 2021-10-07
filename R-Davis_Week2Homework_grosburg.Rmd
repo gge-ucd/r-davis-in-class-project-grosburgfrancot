@@ -1,0 +1,72 @@
+---
+title: "R-Davis_Week2hw_grosburg"
+output: html_document
+---
+#Grace Rosburg-Francot
+#10/04/2021
+#R-Davis 
+#Week 2 Homework 
+
+
+
+```{r}
+set.seed(15)
+
+```
+
+
+```{r}
+hw2 <- runif(50, 4, 50)
+hw2
+
+```
+
+
+```{r}
+hw2 <- replace(hw2, c(4,12,22,27), NA)
+hw2
+```
+
+#PROBLEM 1:Take your hw2 vector and removed all the NAs then select all the numbers between 14 and 38 inclusive, call this vector prob1.
+
+
+```{r}
+prob <- na.omit(hw2)
+prob
+```
+
+```{r}
+prob1 <- subset(prob, prob>14 & prob<=38)
+prob1
+```
+
+#PROBLEM 2:Multiply each number in the prob1 vector by 3 to create a new vector called times3. Then add 10 to each number in your times3 vector to create a new vector called plus10.
+
+```{r}
+times3 <- 3*(prob1)
+times3
+
+```
+
+```{r}
+plus10 <- 10+(times3)
+plus10
+```
+
+
+#PROBLEM 3:Select every other number in your plus10 vector by selecting the first number, not the second, the third, not the fourth, etc. If you’ve worked through these three problems in order, you should now have a vector that is 12 numbers long that looks exactly like this one:
+
+
+
+```{r}
+finalvector <- plus10[seq(1, length(plus10),2)]
+finalvector
+
+```
+
+
+```{r}
+file.edit("R-Davis_Week2hw_grosburg")
+```
+
+
