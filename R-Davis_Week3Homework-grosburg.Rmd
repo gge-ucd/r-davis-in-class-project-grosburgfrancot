@@ -1,0 +1,130 @@
+---
+title: "R-Davis_Week3Homework-grosburg"
+output: html_document
+---
+
+
+#'head' function allows you to see only the first 6 rows of all your columns or something
+
+#Can use the 'identical' function to ask if two different data subsets you made in R are the same  
+
+#Can use the mutate function to add a new column to a dataframe that is based on a existing column you manipulated 
+
+
+```{r}
+library(tidyverse)
+```
+
+#Load your survey data frame with the read.csv() function. 
+
+
+```{r}
+surveys <- read.csv('data/portal_data_joined.csv')
+surveys
+```
+#Create a new data frame called surveys_base with only the species_id, the weight, and the plot_type columns.
+
+```{r}
+surveys_base <- select(surveys, "species_id","weight","plot_type")
+str(surveys_base)
+```
+
+# Have this data frame only be the first 60 rows. 
+
+
+```{r}
+surveys_base <- surveys_base[1:60, c(1:3)]
+str(surveys_base)
+```
+
+
+#Convert both species_id and plot_type to factors. Explore these variables and try to explain why a factor is different from a character.
+
+
+```{r}
+surveys_base$species_id <- as.factor(surveys_base$species_id)
+class(surveys_base$species_id)
+
+```
+
+
+```{r}
+surveys_base$plot_type <- as.factor(surveys_base$plot_type)
+class(surveys_base$plot_type)
+```
+
+#you can use the class function to tell you wether a column is a factor or a character
+
+#A factor can be treated like a number whereas a character is treated more like a name of something or a descriptor of something and not something you can do numerical stuff with as much
+`
+
+
+#Remove all rows where there is an NA in the weight column.
+
+```{r}
+?na.omit
+```
+
+
+
+```{r}
+is.na(surveys_base$weight)
+```
+```{r}
+!is.na(surveys_base$weight)
+```
+
+
+```{r}
+surveys_base[is.na(surveys_base$weight),]
+```
+```{r}
+surveys_base[!is.na(surveys_base$weight),]
+```
+```{r}
+surveys_base[complete.cases(surveys_base),]
+```
+```{r}
+complete.cases(surveys_base)
+```
+
+
+
+
+```{r}
+surveys_base %>% na.omit(surveys_base$weight)
+```
+
+#Create a new data frame from the surveys that meets the following criteria
+#contains only the species_id coulmn 
+#and a new column called hondfoot_half containing values that are half the hindfoot_half 
+#in hindfoot_half, make it where there are no Nas, and avlues are less than 30 
+
+```{r}
+surveys$hindfoot_length
+
+surveys_hindfoot_half <- surveys %>%
+  filter(.,!is.na(hindfoot_length))%>%
+  mutate(.,hindfoot_half = hindfoot_length/2) %>%
+  select(.,species_id,hindfoot_half) %>%
+  filter(.,hindfoot_half < 30)
+
+str(surveys_hindfoot_half)
+```
+
+
+```{r}
+
+surveys_hindfoot_half %>% group_by(species_id) %>%
+  mutate(hindfoot_length = hindfoot_half*2) %>%
+  summarize(mean(hindfoot_length),min(hindfoot_length,max(hindfoot_length))) %>%
+  head()
+```
+
+
+
+
+
+
+
+
