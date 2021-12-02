@@ -1,0 +1,206 @@
+---
+title: "R-Davis_Week6lecture"
+output: html_document
+---
+
+Homework #5 review 
+
+This week’s questions will have us practicing pivots and conditional statements.
+
+ 
+Create a tibble named surveys from the portal_data_joined.csv file. Then manipulate surveys to create a new dataframe called surveys_wide with a column for genus and a column named after every plot type, with each of these columns containing the mean hindfoot length of animals in that plot type and genus.So every row has a genus and then a mean hindfoot length value for every plot type. The dataframe should be sorted by values in the Control plot type column. This question will involve quite a few of the functions you’ve used so far, and it may be useful to sketch out the steps to get to the final result.
+
+Using the original surveys dataframe, use the two different functions we laid out for conditional statements, ifelse() and case_when(), to calculate a new weight category variable called weight_cat. For this variable, define the rodent weight into three categories, where “small” is less than or equal to the 1st quartile of weight distribution, “medium” is between (but not inclusive) the 1st and 3rd quartile, and “large” is any weight greater than or equal to the 3rd quartile. (Hint: the summary() function on a column summarizes the distribution). For ifelse() and case_when(), compare what happens to the weight values of NA, depending on how you specify your arguments.
+
+BONUS: How might you soft code the values (i.e. not type them in manually) of the 1st and 3rd quartile into your conditional statements in question 2?
+
+
+
+# EXPLORING the NA situation with conditional statements
+## leaving the last "else" argument in case_when assigns the 'large' value to EVERYTHING else, including NAs
+
+
+```{r}
+library(tidyverse)
+surveys <- read_csv("data/portal_data_joined.csv")
+```
+
+
+# Manipulate surveys to create a new dataframe called surveys_wide with:
+# 1. column for genus and a column named after every plot type (step 2)
+# 2. each of these columns containing the mean hindfoot length of animals in that plot type and genus. So every row has a genus and then a mean hindfoot length value for every plot type. (step 1)
+# 3. The dataframe should be sorted by values in the Control plot type column. (step 3)
+
+# Step 1:
+
+```{r}
+surveys
+```
+
+surveys_mz <- surveys %>% 
+  filter(!is.na(weight)) %>% 
+  group_by(genus, plot_id) %>% 
+  summarize(mean_weight = mean(weight)) 
+
+```{r}
+surveys_wide <- surveys %>%
+  group_by(genus, plot_type) %>%
+  pivot_wider(names_from = "plot_id")
+surveys_wide
+
+```
+
+
+# Step 2 & 3:
+
+
+```{r}
+
+```
+
+
+
+#End of hw, on to Data Visulization part 1 
+
+
+```{r}
+surveys_complete <- read_csv("data/portal_data_joined.csv") %>% 
+  filter(complete.cases(.))
+
+```
+
+#Challenge
+Use what you just learned to create a scatter plot of weight and species_id with weight on the Y-axis, and species_id on the X-axis. Have the colors be coded by plot_type. Is this a good way to show this type of data? What might be a better graph?
+
+
+#maxgraceyear <- mynamedata[mynamedata$prop==max(mynamedata$prop),]
+
+
+```{r}
+surveys_complete <- surveys %>%
+  filter(complete.cases(.))
+
+plot <- ggplot(data = surveys_complete, mapping = aes(y = weight, x = species_id)) +
+  geom_point(alpha = 0.5, aes(color = plot_type))
+plot
+```
+
+```{r}
+# plot types as panels
+ggplot(surveys_complete, aes(x = species_id, y = weight)) +
+  geom_point() +
+  facet_wrap(~plot_type)
+```
+
+#Boxplot challenge
+
+Challenges
+1. Boxplots are useful summaries, but hide the shape of the distribution. For example, if the distribution is bimodal, we would not see it in a boxplot. An alternative to the boxplot is the violin plot, where the shape (of the density of points) is drawn.
+
+Replace the box plot with a violin plot; see geom_violin().
+
+2. In many types of data, it is important to consider the scale of the observations. For example, it may be worth changing the scale of the axis to better distribute the observations in the space of the plot. Changing the scale of the axes is done similarly to adding/modifying other components (i.e., by incrementally adding commands). Try making these modifications:
+
+Represent weight on the log10 scale; see scale_y_log10().
+
+3. Make a new plot to explore the distrubtion of hindfoot_length just for species NL and PF. Overlay a jitter plot of the hindfoot lengths of each species by a boxplot. Then, color the datapoints according to the plot from which the sample was taken.
+Hint: Check the class for plot_id. Consider changing the class of plot_id from integer to factor. Why does this change how R makes the graph?
+
+plot <- ggplot(data = surveys_complete, mapping = aes(y = weight, x = species_id)) +
+  geom_point(alpha = 0.5, aes(color = plot_type))
+plot
+
+
+#class attempt 
+
+```{r}
+vplot <- ggplot(data = surveys_complete, mapping = aes(y = weight, x = species_id)) +
+  geom_violin(alpha = 0.5, aes(color = plot_type))
+vplot
+```
+
+
+```{r}
+vplot <- ggplot(data = surveys_complete, mapping = aes(y = weight, x = species_id)) +
+  geom_violin(alpha = 0.5, aes(color = plot_type))
+  scale_y_log10()
+
+vplot
+
+
+
+
+```
+
+maxgraceyear <- mynamedata[mynamedata$prop==max(mynamedata$prop),]
+
+```{r}
+vplot <- ggplot(data = surveys_complete, mapping = aes(y = hindfoot_length, x = surveys_complete[surveys_complete$species_id==("NL"),])) +
+  geom_violin(alpha = 0.5, aes(color = plot_type))
+vplot
+```
+
+#actual way to do it 
+
+```{r}
+# adding violin
+ggplot(data = surveys_complete, mapping = aes(x = species_id, y = weight)) +
+  geom_jitter(alpha = 0.1, color = "tomato") +
+  geom_violin(alpha = 0)
+
+```
+
+```{r}
+# adding log
+base <- ggplot(data = surveys_complete, mapping = aes(x = species_id, y = weight))
+
+base +
+  geom_jitter(alpha = .1) +
+  geom_violin() +
+  scale_y_log10()
+
+
+```
+
+
+```{r}
+surveys_complete %>%
+  # inclusive is & vs "or" |
+  filter(species_id == "NL" | species_id == "PF") %>%
+  ggplot(mapping = aes(x = species_id, y = hindfoot_length)) +
+  geom_boxplot(alpha = 0.1) +
+  geom_jitter(alpha = 0.3, mapping = aes(color = plot_id))
+
+```
+
+```{r}
+hindfoot_survey <- surveys_complete %>%
+  # inclusive is & vs "or" |
+  filter(species_id == "NL" | species_id == "PF")
+
+hindfoot_survey$plot_factor <- as.factor(hindfoot_survey$plot_id)
+ggplot(data = hindfoot_survey,
+       mapping = aes(x = species_id, y = hindfoot_length)) +
+  geom_boxplot(alpha = 0.1) +
+  geom_jitter(alpha = 0.3, mapping = aes(color = plot_factor))
+```
+
+#How to manipulate axis labels and stuff 
+
+```{r}
+surveys_complete %>%
+  # inclusive is & vs "or" |
+  filter(species_id == "NL" | species_id == "PF") %>%
+  ggplot(mapping = aes(x = species_id, y = hindfoot_length)) +
+  geom_boxplot(alpha = 0.1) +
+  geom_jitter(alpha = 0.3, mapping = aes(color = as.factor(plot_id))) +
+  labs(x = "Species ID",
+       y = "Hindfoot Length",
+       title = "Boxplot",
+       color = "Plot ID") +
+  theme_classic() +
+  theme(axis.title.x = element_text(angle = 55))
+
+```
+
+

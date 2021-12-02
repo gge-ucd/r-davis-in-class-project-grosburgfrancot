@@ -1,0 +1,17 @@
+---
+title: "R-Davis_Week3lecture"
+output: html_document
+---
+
+
+```{r}
+setwd("/Users/gracerosburg/Desktop/R Davis/r-davis-in-class-project-grosburgfrancot/data")
+getwd()
+```
+
+
+
+```{r}
+data<- read.csv("data/portal_data_joined.csv")
+```
+

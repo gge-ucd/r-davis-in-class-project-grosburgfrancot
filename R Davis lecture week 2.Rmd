@@ -1,0 +1,91 @@
+---
+title: "R Davis class lecture Week 2"
+output: html_document
+---
+
+#how to use and manipulate vectors
+#indexing and subetting are the same thing!
+
+```{r}
+letters
+a<- 1
+a<- 2
+```
+```{r}
+gracevec<- c(7,8,9)
+gracevec
+```
+
+```{r}
+gracevec[2]
+```
+
+
+```{r}
+gracevec[c(2,2)]
+```
+
+```{r}
+gracevec[c(1,2,3)]
+gracevec[c(3,2,1)]
+```
+
+# strings are the things that you put in quotes, like column names etc. A string is a character vector or something 
+
+#can use the ? to find out more about certain functions 
+
+
+```{r}
+(gracestring <- c("7", "17", "77","b"))
+gracestring
+```
+
+```{r}
+data.frame(c(gracestring,gracestring))
+```
+
+#can create a dataframe in R by using the setting 
+
+
+
+```{r}
+data.frame(first_column = gstring,second_column = c(gstring,'23'))
+
+```
+
+#you can use class to figure out what a column or row contains (i.e. numbers vs characters)
+
+
+```{r}
+class(gracestring)
+```
+
+
+# You can use a list to store random things in R
+
+```{r}
+test_list = list("a","b","c","d")
+test_list
+
+```
+
+
+
+```{r}
+c(test_list,2)
+str(test_list)
+test_list[[1]][2] <- 'add next thing'
+
+
+```
+```{r}
+
+gracelist <- list(gracestring,"a","c")
+gracelist
+```
+
+```{r}
+vectorgracelist <- c("a","c")
+vectorgracelist
+```
+

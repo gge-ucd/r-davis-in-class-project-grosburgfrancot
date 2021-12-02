@@ -1,0 +1,159 @@
+---
+title: "R-Davis_Week5lecture"
+output: html_document
+---
+
+#Week 4 hw review 
+
+```{r}
+library(tidyverse)
+```
+
+
+#1
+
+```{r}
+surveys <- read.csv("data/portal_data_joined.csv")
+surveys
+```
+
+#2
+#Subset surveys to keep rows with weight between 30 and 60, and print out the first 6 rows.
+
+```{r}
+surveys <- subset(surveys, surveys$weight>=30 & surveys$weight<=60)
+head(surveys)
+```
+#3
+#Create a new tibble showing the maximum weight for each species + sex combination and name it biggest_critters. Sort the tibble to take a look at the biggest and smallest species + sex combinations. HINT: it’s easier to calculate max if there are no NAs in the dataframe…
+
+
+
+```{r}
+biggest_critters <- surveys %>%
+  filter(!is.na(weight) & !is.na(sex) & !is.na(species)) %>%
+  group_by(species, sex) %>%
+  summarize(maximum_weight = max(weight))
+biggest_critters
+
+```
+
+
+#4Try to figure out where the NA weights are concentrated in the data- is there a particular species, taxa, plot, or whatever, where there are lots of NA values? There isn’t necessarily a right or wrong answer here, but manipulate surveys a few different ways to explore this. Maybe use tally and arrange here.
+
+```{r}
+surveys %>%
+  filter(is.na(hindfoot_length)) %>%
+  group_by(species) %>%
+  tally()
+```
+
+
+
+
+#Week 5 Lecture 
+
+
+#conditional statements 
+
+#the ~ represents the "then" in an "if then" statement
+
+```{r}
+
+surveys %>%
+  filter(!is.na(weight)) %>%
+  mutate(weight_cat = case_when(weight > mean(weight) ~ "big",
+                                weight < mean(weight) ~ "small")) %>%
+  select(weight, weight_cat)
+```
+#Challenge
+#Using the iris data frame (this is built in to R), create a new variable that categorizes petal length into three groups:
+
+#small (less than or equal to the 1st quartile)
+#medium (between the 1st and 3rd quartiles)
+#large (greater than or equal to the 3rd quartile)
+#Hint: Explore the iris data using summary(iris$Petal.Length), to see the petal length distribution. Then use your function of choice: ifelse() or case_when() to make a new variable named petal.length.cat based on the conditions listed above. Note that in the iris data frame there are no NAs, so we don’t have to deal with them here.
+
+
+
+```{r}
+summary(iris$Petal.Length)
+```
+
+
+```{r}
+iris %>%
+  mutate(length_cat = case_when(Petal.Length <= 1.6 ~ "small",
+                                Petal.Length > 1.6 & Petal.Length< 5.1 ~ "medium",
+                                Petal.Length > 5.1 ~ "large"))
+```
+
+#if R senses that there are columns with commonalities it does some stuff and things 
+#you can join columns from different datasets with the join commands 
+
+```{r}
+surveys = read_csv('data/portal_data_joined.csv')
+tail_length = read_csv('data/tail_length.csv')
+
+
+str(tail_length)
+str(surveys)
+
+intersect(colnames(surveys),colnames(tail_length))
+```
+
+
+```{r}
+combo_dataframe <- left_join(surveys, tail_length)
+str(combo_dataframe)
+```
+
+
+
+#pivot_wider
+#pivot_wider() widens data by increasing the number of columns and decreasing the number of rows. It takes three main arguments:
+
+#the data
+#names_from the name of the column you’d like to spread out
+#values_from the data you want to fill all your new columns with
+
+
+
+
+#pivot functions are a way to take a wide dataframe and make it longer or something
+
+#Challenge
+#Use pivot_wider on the surveys data frame with year as columns, plot_id as rows, and the number of genera per plot as the values. You will need to summarize before reshaping, and use the function n_distinct() to get the number of unique genera within a particular chunk of data. It’s a powerful function! See ?n_distinct for more.
+#The surveys data set has two measurement columns: hindfoot_length and weight. This makes it difficult to do things like look at the relationship between mean values of each measurement per year in different plot types. Let’s walk through a common solution for this type of problem. First, use pivot_longer() to create a dataset where we have a new column called measurement and a value column that takes on the value of either hindfoot_length or weight. Hint: You’ll need to specify which columns are being selected to make longer.
+#With this new data set, calculate the average of each measurement in each year for each different plot_type. Then use pivot_wider() to get them into a data set with a column for hindfoot_length and weight. Hint: You only need to specify the names_from = and values_from = columns
+
+
+
+```{r}
+surveys %>% group_by(year,plot_id) %>% tally()
+
+
+```
+```{r}
+
+temp_df = surveys %>% group_by(year,plot_id) %>% tally()
+temp_df = temp_df %>% ungroup()
+
+pivot_wider(temp_df)
+pivot_wider(temp_df,names_from = 'year',values_from = 'n')
+
+pivot_wider(data = surveys,id_cols = c('plot_id'),
+            names_from = year,values_fn = n)
+```
+
+
+
+
+
+
+
+
+
+
+
+
